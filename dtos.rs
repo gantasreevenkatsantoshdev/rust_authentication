@@ -41,3 +41,43 @@ pub struct LoginUserDto {
     )]
     pub password: String,
 }
+#[derive(Serialize, Deserialize, Validate)]
+pub struct RequestQueryDto {
+    #[validate(range(min = 1))]
+    pub page: Option<usize>,
+    #[validate(range(min = 1, max = 50))]
+    pub limit: Option<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FilterUserDto {
+    pub id: String,
+    pub name: String,
+    pub email: String,
+    pub role: String,
+    pub verified: bool,
+    #[serde(rename = "created_at")]
+    pub created_at: DateTime<Utc>,
+    #[serde(rename = "updated_at")]
+    pub updated_at: DateTime<Utc>,
+}
+
+impl FilterUserDto {
+    pub fn filter_user(user: &User) -> Self {
+        FilterUserDto {
+            id: user.id.to_string(),
+            name: user.name.to_owned(),
+            email: user.email.to_owned(),
+            role: user.role.to_str().to_string(),
+            verified: user.verified,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
+        }
+    }
+    pub fn filter_users(user: &[User]) -> Vec<FilterUserDto> {
+        user.iter().map(FilterUserDto::filter_user).collect()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserData {}
